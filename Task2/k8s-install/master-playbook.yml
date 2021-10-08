@@ -104,7 +104,7 @@
       daemon_reload: yes
       state: restarted
   - name: Initialize the Kubernetes cluster using kubeadm
-    command: kubeadm init --apiserver-advertise-address="10.11.12.30" --apiserver-cert-extra-sans="10.11.12.30"  --node-name controlplane
+    command: kubeadm init --apiserver-advertise-address="10.11.12.30" --apiserver-cert-extra-sans="10.11.12.30"  --node-name controlplane --pod-network-cidr=10.244.0.0/16
   - name: Setup kubeconfig for vagrant user
     command: "{{ item }}"
     with_items:
