@@ -24,4 +24,7 @@ sudo mv ./kubectl /usr/local/bin/kubectl
 kubectl version
 
 # Start minikube using 2 nodes
-minikube start --nodes 2
+minikube start --nodes 3
+
+# check K8S Cluster
+kubectl get nodes
