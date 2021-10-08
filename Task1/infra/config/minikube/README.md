@@ -26,5 +26,8 @@ kubectl version
 # Start minikube using 3 nodes
 minikube start --nodes 3
 
+or add node
+minikube node add
+
 # check K8S Cluster
 kubectl get nodes
