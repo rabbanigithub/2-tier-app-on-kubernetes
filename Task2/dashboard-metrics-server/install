@@ -1,0 +1,9 @@
+#Install Dashboard
+git clone https://github.com/rabbanigithub/bs23db.git
+cd bs23db/dashboard/
+kubeclt apply -f .
+
+#Install Metrics Server
+git clone https://github.com/rabbanigithub/bs23db.git
+cd bs23db/metrics-server/
+kubeclt apply -f .
