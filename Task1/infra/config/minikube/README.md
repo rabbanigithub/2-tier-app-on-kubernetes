@@ -23,7 +23,7 @@ sudo chmod +x ./kubectl
 sudo mv ./kubectl /usr/local/bin/kubectl
 kubectl version
 
-# Start minikube using 2 nodes
+# Start minikube using 3 nodes
 minikube start --nodes 3
 
 # check K8S Cluster
