@@ -1,4 +1,4 @@
-First enable virtualization at BIOS
+# First enable virtualization at BIOS
 
 # Update Ubuntu repo
 sudo apt update
