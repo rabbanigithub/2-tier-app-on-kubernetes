@@ -1,6 +1,7 @@
 You must have to enable Hardware virtualization of the VM or Physical server.
 
 #Install from ubuntu repo
+sudo apt update
 sudo apt get install vagrant virtualbox -y
 
 #Install from web
