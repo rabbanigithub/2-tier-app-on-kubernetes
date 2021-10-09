@@ -13,7 +13,7 @@ node {
     }
     stage('Deploy on k8s Server'){
         def app1DeployRun = 'kubectl apply -f app1-deploy.yaml'
-		def app1DeploySVCRun = 'kubectl apply -f app1-deploy-svc.yaml'
+	def app1DeploySVCRun = 'kubectl apply -f app1-deploy-svc.yaml'
         sshagent(['jkpv-key']) {
             sh "scp -o StrictHostKeyChecking=no ./Task1/app1/deploy/*.yaml oculintech@172.20.4.64:~/"
             sh "ssh -o StrictHostKeyChecking=no oculintech@172.20.4.64 ${app1DeployRun}"
