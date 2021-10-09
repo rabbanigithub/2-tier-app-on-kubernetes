@@ -5,6 +5,12 @@ node {
     stage('Build Docker Image'){
         sh 'docker build -t rabbanidocker/app1 -f ./Task1/app1/build/Dockerfile .'
     }
+    stage('Push Docker Image'){
+        withCredentials([string(credentialsId: 'docker-pass', variable: 'dockerHubPass')]) {
+            sh "docker login -u rabbanidocker -p ${dockerHubPass}"
+            }
+        sh 'docker push rabbanidocker/app1'
+    }
     stage('Deploy on k8s Server'){
         def app1DeployRun = 'kubectl apply -f app1-deploy.yaml'
 		def app1DeploySVCRun = 'kubectl apply -f app1-deploy-svc.yaml'

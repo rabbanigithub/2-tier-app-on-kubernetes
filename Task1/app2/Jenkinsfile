@@ -5,9 +5,15 @@ node {
     stage('Build Docker Image'){
         sh 'docker build -t rabbanidocker/app2 -f ./Task1/app2/build/Dockerfile .'
     }
+    stage('Push Docker Image'){
+        withCredentials([string(credentialsId: 'docker-pass', variable: 'dockerHubPass')]) {
+            sh "docker login -u rabbanidocker -p ${dockerHubPass}"
+            }
+        sh 'docker push rabbanidocker/app2'
+    }
     stage('Deploy on k8s Server'){
         def app2DeployRun = 'kubectl apply -f app2-deploy.yaml'
-	def app2DeploySVCRun = 'kubectl apply -f app2-deploy-svc.yaml'
+	    def app2DeploySVCRun = 'kubectl apply -f app2-deploy-svc.yaml'
         sshagent(['jkpv-key']) {
             sh "scp -o StrictHostKeyChecking=no ./Task1/app2/deploy/*.yaml oculintech@172.20.4.64:~/"
             sh "ssh -o StrictHostKeyChecking=no oculintech@172.20.4.64 ${app2DeployRun}"
