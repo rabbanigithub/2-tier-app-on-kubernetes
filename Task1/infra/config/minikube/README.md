@@ -1,4 +1,4 @@
-First enable virtualization at BIOS
+# First enable virtualization at BIOS
 
 # Update Ubuntu repo
 sudo apt update
@@ -23,8 +23,13 @@ sudo chmod +x ./kubectl
 sudo mv ./kubectl /usr/local/bin/kubectl
 kubectl version
 
-# Start minikube using 2 nodes
-minikube start --nodes 3
+# Start minikube using 3 nodes
+minikube start --nodes 2
+
+or add node
+
+minikube node add
 
 # check K8S Cluster
 kubectl get nodes
+
