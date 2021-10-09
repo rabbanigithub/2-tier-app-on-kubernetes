@@ -1,8 +1,9 @@
 # First enable virtualization at BIOS
 
 # Update Ubuntu repo
+```
 sudo apt update
-
+```
 # make sure to install the following required packages
 ```
 sudo apt install -y apt-transport-https curl
@@ -28,11 +29,11 @@ kubectl version
 ```
 # Start minikube using 3 nodes
 ```
-minikube start --nodes 3
+sudo minikube start --nodes 3
 ```
 or add new 
 ```
-minikube node add
+sudo minikube node add
 ```
 # check K8S Cluster
 ```
