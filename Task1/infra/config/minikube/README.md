@@ -24,10 +24,17 @@ sudo mv ./kubectl /usr/local/bin/kubectl
 kubectl version
 
 # Start minikube using 3 nodes
+<<<<<<< HEAD
 minikube start --nodes 2
 
 or add node
 
+minikube node add
+=======
+minikube start --nodes 3
+>>>>>>> 7f3a4b1f365acda422aefd61db756224b8346490
+
+or add node
 minikube node add
 
 # check K8S Cluster
