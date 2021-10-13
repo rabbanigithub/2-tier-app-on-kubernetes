@@ -29,11 +29,11 @@ kubectl version
 ```
 # Start minikube using 3 nodes
 ```
-sudo minikube start --nodes 3
+minikube start --nodes 3
 ```
 or add new 
 ```
-sudo minikube node add
+minikube node add
 ```
 # check K8S Cluster
 ```
