@@ -13,20 +13,20 @@
       - ca-certificates
       - curl
       - gnupg
-      - software-properties-common
-      - lsb-release
+ #     - software-properties-common
+ #     - lsb-release
 
   - name: Add an apt signing key for Docker
     apt_key:
       url: https://download.docker.com/linux/ubuntu/gpg
       state: present
 
-  - name: Add apt repository for stable version
+  - name: Add apt repository for Docker stable version
     apt_repository:
       repo: deb [arch=amd64] https://download.docker.com/linux/ubuntu focal stable
       state: present
 
-  - name: Install docker and its dependecies
+  - name: Install Docker and its dependecies
     apt:
       name: "{{ packages }}"
       state: present
@@ -44,7 +44,7 @@
       src: daemon.json
       dest: /etc/docker/daemon.json
       
-  - name: Restart Docker
+  - name: Restart Docker Service
     service:
       name: docker
       daemon_reload: yes
