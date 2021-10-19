@@ -133,8 +133,14 @@
 
   - name: Copy join command to local file
     local_action: copy content="{{ join_command.stdout_lines[0] }}" dest="./join-command"
+   
+  - name: Install bash-completion package
+    apt:
+      name: bash-completion
+      state: present
+      update_cache: yes
 
-  - name: Add autocomplete permanently to your bash shell
+  - name: Add autocomplete permanently to bash shell
     shell: echo "source <(kubectl completion bash)" >> ~/.bashrc
     
   handlers:
