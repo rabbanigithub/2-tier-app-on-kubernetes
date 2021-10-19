@@ -40,7 +40,9 @@
       - docker-status
 
   - name: Configure the Docker daemon
-    copy: src: daemon.json dest: /etc/docker/daemon.json
+    copy: 
+      src: daemon.json
+      dest: /etc/docker/daemon.json
 
   - name: Restart Docker service
     service:
@@ -121,7 +123,9 @@
 
   - name: Copy pod network file kube-flannel.yml
     become: false
-    copy: src: kube-flannel.yml dest: /tmp/kube-flannel.yml
+    copy:
+      src: kube-flannel.yml
+      dest: /tmp/kube-flannel.yml
 
   - name: Install flannel pod network
     become: false
