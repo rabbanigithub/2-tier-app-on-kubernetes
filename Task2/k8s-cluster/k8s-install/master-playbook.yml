@@ -121,9 +121,7 @@
 
   - name: Copy pod network file kube-flannel.yml
     become: false
-    copy:
-      src: kube-flannel.yml
-      dest: /tmp/kube-flannel.yml
+    copy: src: kube-flannel.yml dest: /tmp/kube-flannel.yml
 
   - name: Install flannel pod network
     become: false
