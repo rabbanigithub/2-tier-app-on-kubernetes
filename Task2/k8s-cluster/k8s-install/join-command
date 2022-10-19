@@ -1,1 +1,0 @@
-kubeadm join 10.11.12.30:6443 --token lqz5xn.avcwnqfrccmogs60 --discovery-token-ca-cert-hash sha256:2726609e68b808037fed1d5f5916269a968ffc1e9093cea749dc32415b928fb9 
