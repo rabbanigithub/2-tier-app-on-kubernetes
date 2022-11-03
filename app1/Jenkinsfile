@@ -1,5 +1,5 @@
 node {
-    def tag=$('date +%Y%m%d%H%M%S') 
+    def tag=$('sh date +%Y%m%d%H%M%S') 
     stage('SCM Checkout'){
         git branch: 'master', url: 'https://github.com/rabbanigithub/2-tier-app-on-kubernetes.git'
     }
