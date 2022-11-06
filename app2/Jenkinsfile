@@ -5,14 +5,9 @@ pipeline {
     }
 	
     stages {
-        stage('SCM Checkout'){
-            steps {
-                git branch: 'master', url: 'https://github.com/rabbanigithub/2-tier-app-on-kubernetes.git'
-            }
-        }
         stage('Build Docker Image') {
             steps {
-                sh "docker build -t rabbanidocker/app2:${SHA} -f ./app2/build/Dockerfile ."
+                sh "docker build -t rabbanidocker/app2:latest -t rabbanidocker/app2:${SHA} -f ./app2/build/Dockerfile ."
             }
         }
         stage('Push Docker Image') {
@@ -20,21 +15,22 @@ pipeline {
                 withCredentials([usernamePassword(credentialsId: 'dockerHubCredential', usernameVariable: 'dockerHubUser', passwordVariable: 'dockerHubPass')]) {
                 sh 'echo ${dockerHubPass} | docker login -u ${dockerHubUser} --password-stdin'
                 }
+                sh 'docker push rabbanidocker/app2:latest'
                 sh 'docker push rabbanidocker/app2:${SHA}'
             }
         }
         stage('Deploy on k8s Cluster') {
             environment {
                 createDir = 'mkdir -p /tmp/app2'
-                app2DeployRun = 'kubectl apply -f /tmp/app2/app2-deploy.yaml'
-                app2DeploySVCRun = 'kubectl apply -f /tmp/app2/app2-deploy-svc.yaml'
+                k8sDeploy = 'kubectl apply -f /tmp/app2/'
+                k8sImageUpdate = 'kubectl set image deployment/app2-deploy app2=rabbanidocker/app2:${SHA}'
             }
             steps {
                 sshagent(['b3e9356b-6c02-4a33-9f13-b36c68367023']) {
                     sh "ssh -o StrictHostKeyChecking=no -p 2330 vagrant@172.20.4.63 ${createDir}"
                     sh "scp -o StrictHostKeyChecking=no -P 2330 ./app2/deploy/*.yaml vagrant@172.20.4.63:/tmp/app2/"
-                    sh "ssh -o StrictHostKeyChecking=no -p 2330 vagrant@172.20.4.63 ${app2DeployRun}"
-                    sh "ssh -o StrictHostKeyChecking=no -p 2330 vagrant@172.20.4.63 ${app2DeploySVCRun}"
+                    sh "ssh -o StrictHostKeyChecking=no -p 2330 vagrant@172.20.4.63 ${k8sDeploy}"
+                    sh "ssh -o StrictHostKeyChecking=no -p 2330 vagrant@172.20.4.63 ${k8sImageUpdate}"
                 }
             }
         }
