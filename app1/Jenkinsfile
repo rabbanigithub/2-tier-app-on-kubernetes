@@ -1,24 +1,27 @@
-node {
-    def tag=$('sh date +%Y%m%d%H%M%S') 
-    stage('SCM Checkout'){
-        git branch: 'master', url: 'https://github.com/rabbanigithub/2-tier-app-on-kubernetes.git'
+pipeline {
+    agent any
+    environment {
+        SHA = sh(returnStdout: true, script: "git rev-parse --short=10 HEAD").trim()
     }
-    stage('Build Docker Image'){
-        sh 'docker build -t rabbanidocker/app1:${tag} -f ./app1/build/Dockerfile .'
+	
+    stages {
+        stage('SCM Checkout'){
+            steps {
+                git branch: 'master', url: 'https://github.com/rabbanigithub/2-tier-app-on-kubernetes.git'
+            }
+        }
+        stage('Build Docker Image') {
+            steps {
+                sh "docker build -t rabbanidocker/app1:${SHA} -f ./app1/build/Dockerfile ."
+            }
+        }
+        stage('Push Docker Image') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'dockerHubCredential', usernameVariable: 'dockerHubUser', passwordVariable: 'dockerHubPass')]) {
+                sh 'echo ${dockerHubPass} | docker login -u ${dockerHubUser} --password-stdin'
+                }
+                sh 'docker push rabbanidocker/app1:${SHA}'
+            }
+        }
     }
-    // stage('Push Docker Image'){
-    //     withCredentials([string(credentialsId: 'docker-pass', variable: 'dockerHubPass')]) {
-    //         sh "docker login -u rabbanidocker -p ${dockerHubPass}"
-    //         }
-    //     sh 'docker push rabbanidocker/app1'
-    // }
-    // stage('Deploy on k8s Server'){
-    //     def app1DeployRun = 'kubectl apply -f app1-deploy.yaml'
-	//     def app1DeploySVCRun = 'kubectl apply -f app1-deploy-svc.yaml'
-    //     sshagent(['jkpv-key']) {
-    //         sh "scp -o StrictHostKeyChecking=no ./app1/deploy/*.yaml oculintech@172.20.4.64:~/"
-    //         sh "ssh -o StrictHostKeyChecking=no oculintech@172.20.4.64 ${app1DeployRun}"
-    //         sh "ssh -o StrictHostKeyChecking=no oculintech@172.20.4.64 ${app1DeploySVCRun}"
-    //     }
-    // }
 }
