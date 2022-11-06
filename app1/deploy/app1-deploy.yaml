@@ -23,4 +23,4 @@ spec:
         ports:
         - containerPort: 80
       nodeSelector:
-        kubernetes.io/hostname: minikube-m02
+        kubernetes.io/hostname: node1
