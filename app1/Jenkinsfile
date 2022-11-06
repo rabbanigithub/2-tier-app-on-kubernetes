@@ -5,11 +5,11 @@ pipeline {
     }
 	
     stages {
-        stage('SCM Checkout'){
-            steps {
-                git branch: 'master', url: 'https://github.com/rabbanigithub/2-tier-app-on-kubernetes.git'
-            }
-        }
+//        stage('SCM Checkout'){
+//            steps {
+//                git branch: 'master', url: 'https://github.com/rabbanigithub/2-tier-app-on-kubernetes.git'
+//            }
+//        }
         stage('Build Docker Image') {
             steps {
                 sh "docker build -t rabbanidocker/app1:${SHA} -f ./app1/build/Dockerfile ."
