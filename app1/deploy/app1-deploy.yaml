@@ -18,7 +18,7 @@ spec:
         app: app1-deploy
     spec:
       containers:
-      - image: rabbanidocker/app1
+      - image: rabbanidocker/app1:latest
         name: app1
         ports:
         - containerPort: 80

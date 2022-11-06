@@ -1,23 +1,42 @@
-node {
-    stage('SCM Checkout'){
-        git branch: 'master', url: 'https://github.com/rabbanigithub/2-tier-app-on-kubernetes.git'
+pipeline {
+    agent any
+    environment {
+        SHA = sh(returnStdout: true, script: "git rev-parse --short=10 HEAD").trim()
     }
-    stage('Build Docker Image'){
-        sh 'docker build -t rabbanidocker/app2 -f ./app2/build/Dockerfile .'
-    }
-    stage('Push Docker Image'){
-        withCredentials([string(credentialsId: 'docker-pass', variable: 'dockerHubPass')]) {
-            sh "docker login -u rabbanidocker -p ${dockerHubPass}"
+	
+    stages {
+        stage('SCM Checkout'){
+            steps {
+                git branch: 'master', url: 'https://github.com/rabbanigithub/2-tier-app-on-kubernetes.git'
             }
-        sh 'docker push rabbanidocker/app2'
-    }
-    stage('Deploy on k8s Server'){
-        def app2DeployRun = 'kubectl apply -f app2-deploy.yaml'
-	    def app2DeploySVCRun = 'kubectl apply -f app2-deploy-svc.yaml'
-        sshagent(['jkpv-key']) {
-            sh "scp -o StrictHostKeyChecking=no ./app2/deploy/*.yaml oculintech@172.20.4.64:~/"
-            sh "ssh -o StrictHostKeyChecking=no oculintech@172.20.4.64 ${app2DeployRun}"
-            sh "ssh -o StrictHostKeyChecking=no oculintech@172.20.4.64 ${app2DeploySVCRun}"
+        }
+        stage('Build Docker Image') {
+            steps {
+                sh "docker build -t rabbanidocker/app2:${SHA} -f ./app2/build/Dockerfile ."
+            }
+        }
+        stage('Push Docker Image') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'dockerHubCredential', usernameVariable: 'dockerHubUser', passwordVariable: 'dockerHubPass')]) {
+                sh 'echo ${dockerHubPass} | docker login -u ${dockerHubUser} --password-stdin'
+                }
+                sh 'docker push rabbanidocker/app2:${SHA}'
+            }
+        }
+        stage('Deploy on k8s Cluster') {
+            environment {
+                createDir = 'mkdir -p /tmp/app2'
+                app2DeployRun = 'kubectl apply -f /tmp/app2/app2-deploy.yaml'
+                app2DeploySVCRun = 'kubectl apply -f /tmp/app2/app2-deploy-svc.yaml'
+            }
+            steps {
+                sshagent(['b3e9356b-6c02-4a33-9f13-b36c68367023']) {
+                    sh "ssh -o StrictHostKeyChecking=no -p 2330 vagrant@172.20.4.63 ${createDir}"
+                    sh "scp -o StrictHostKeyChecking=no -P 2330 ./app2/deploy/*.yaml vagrant@172.20.4.63:/tmp/app2/"
+                    sh "ssh -o StrictHostKeyChecking=no -p 2330 vagrant@172.20.4.63 ${app2DeployRun}"
+                    sh "ssh -o StrictHostKeyChecking=no -p 2330 vagrant@172.20.4.63 ${app2DeploySVCRun}"
+                }
+            }
         }
     }
 }
