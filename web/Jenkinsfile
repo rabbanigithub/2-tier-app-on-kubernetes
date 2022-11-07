@@ -1,0 +1,38 @@
+pipeline {
+    agent any
+    environment {
+        SHA = sh(returnStdout: true, script: "git rev-parse --short=10 HEAD").trim()
+    }
+	
+    stages {
+        stage('Build Docker Image') {
+            steps {
+                sh "docker build -t rabbanidocker/web:latest -t rabbanidocker/web:${SHA} -f ./web/build/Dockerfile ."
+            }
+        }
+        stage('Push Docker Image') {
+            steps {
+                withCredentials([usernamePassword(credentialsId: 'dockerHubCredential', usernameVariable: 'dockerHubUser', passwordVariable: 'dockerHubPass')]) {
+                sh 'echo ${dockerHubPass} | docker login -u ${dockerHubUser} --password-stdin'
+                }
+                sh 'docker push rabbanidocker/web:latest'
+                sh 'docker push rabbanidocker/web:${SHA}'
+            }
+        }
+        stage('Deploy on k8s Cluster') {
+            environment {
+                createDir = 'mkdir -p /tmp/web'
+                k8sDeploy = 'kubectl apply -f /tmp/web/'
+                k8sImageUpdate = 'kubectl set image deployment/web-deploy web=rabbanidocker/web:${SHA}'
+            }
+            steps {
+                sshagent(['b3e9356b-6c02-4a33-9f13-b36c68367023']) {
+                    sh "ssh -o StrictHostKeyChecking=no -p 2330 vagrant@172.20.4.63 ${createDir}"
+                    sh "scp -o StrictHostKeyChecking=no -P 2330 ./web/deploy/*.yaml vagrant@172.20.4.63:/tmp/web/"
+                    sh "ssh -o StrictHostKeyChecking=no -p 2330 vagrant@172.20.4.63 ${k8sDeploy}"
+                    sh "ssh -o StrictHostKeyChecking=no -p 2330 vagrant@172.20.4.63 ${k8sImageUpdate}"
+                }
+            }
+        }
+    }
+}
